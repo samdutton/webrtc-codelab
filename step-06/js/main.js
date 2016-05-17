@@ -221,7 +221,7 @@ function onDataChannelCreated(channel) {
   };
 
   channel.onmessage = (adapter.browserDetails.browser === 'firefox') ?
-    receiveDataFirefoxFactory() : receiveDataChromeFactory();
+  receiveDataFirefoxFactory() : receiveDataChromeFactory();
 }
 
 function receiveDataChromeFactory() {
@@ -300,7 +300,7 @@ function snapPhoto() {
 function sendPhoto() {
 // Split data channel message in chunks of this byte length.
 var CHUNK_LEN = 64000;
-console.log('>>>>>> width and height ', photoContextW, photoContextH);
+console.log('width and height ', photoContextW, photoContextH);
 var img = photoContext.getImageData(0, 0, photoContextW, photoContextH),
 len = img.data.byteLength,
 n = len / CHUNK_LEN | 0;
@@ -333,6 +333,7 @@ function renderPhoto(data) {
   canvas.width = photoContextW;
   canvas.height = photoContextH;
   canvas.classList.add('incomingPhoto');
+  // trail is the element holding the incoming images
   trail.insertBefore(canvas, trail.firstChild);
 
   var context = canvas.getContext('2d');
