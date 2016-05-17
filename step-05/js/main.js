@@ -94,7 +94,16 @@ socket.on('message', function(message) {
 var localVideo = document.querySelector('#localVideo');
 var remoteVideo = document.querySelector('#remoteVideo');
 
-function handleUserMedia(stream) {
+navigator.mediaDevices.getUserMedia({
+  audio: false,
+  video: true
+})
+.then(gotStream)
+.catch(function(e) {
+  alert('getUserMedia() error: ' + e.name);
+});
+
+function gotStream(stream) {
   console.log('Adding local stream.');
   localVideo.src = window.URL.createObjectURL(stream);
   localStream = stream;
@@ -105,15 +114,8 @@ function handleUserMedia(stream) {
 }
 
 var constraints = {
-  audio: false,
   video: true
 };
-
-navigator.mediaDevices.getUserMedia(constraints)
-.then(handleUserMedia)
-.catch(function(e) {
-  alert('getUserMedia() error: ' + e.name);
-});
 
 console.log('Getting user media with constraints', constraints);
 
@@ -188,15 +190,22 @@ function doCall() {
 
 function doAnswer() {
   console.log('Sending answer to peer.');
-  pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+  pc.createAnswer().then(
+    setLocalAndSendMessage,
+    onCreateSessionDescriptionError
+  );
 }
 
 function setLocalAndSendMessage(sessionDescription) {
   // Set Opus as the preferred codec in SDP if Opus is present.
-  sessionDescription.sdp = preferOpus(sessionDescription.sdp);
+  //  sessionDescription.sdp = preferOpus(sessionDescription.sdp);
   pc.setLocalDescription(sessionDescription);
   console.log('setLocalAndSendMessage sending message', sessionDescription);
   sendMessage(sessionDescription);
+}
+
+function onCreateSessionDescriptionError(error) {
+  trace('Failed to create session description: ' + error.toString());
 }
 
 function requestTurn(turnURL) {
